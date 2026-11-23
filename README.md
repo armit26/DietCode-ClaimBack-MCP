@@ -1,5 +1,6 @@
 # ClaimBack MCP 🛡️
 **An MCP-powered personal health insurance claims auditor & human-approved appeal assistant for Indian families.**
+
 [![Track](https://img.shields.io/badge/Track%201-Make%20MCP%20Matter-C2410C?style=flat-square)](https://github.com/armit26/DietCode-ClaimBack-MCP)
 [![Stack](https://img.shields.io/badge/Core-FastMCP%20%7C%20AWS%20%7C%20ElevenLabs-15803D?style=flat-square)](https://github.com/armit26/DietCode-ClaimBack-MCP)
 [![Status](https://img.shields.io/badge/Status-Runnable%20Ideathon%20Prototype-FD9B36?style=flat-square)](https://github.com/armit26/DietCode-ClaimBack-MCP)
