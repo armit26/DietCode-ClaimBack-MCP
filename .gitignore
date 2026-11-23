@@ -1,22 +1,21 @@
-# Secret API keys (NEVER commit)
 .env
 .env.local
 *.pem
 credentials.json
 token.json
 
-# Python
+
 __pycache__/
 *.py[cod]
 venv/
 .venv/
 
-# Next.js / Node
+
 node_modules/
 .next/
 out/
 
-# macOS & Editor junk
+
 .DS_Store
 .vscode/
 .idea/
