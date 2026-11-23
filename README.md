@@ -131,6 +131,5 @@ python -m mcp_server.server
 - **Strict Human-in-the-Loop (HITL):** Gmail MCP is scoped to save **editable drafts only**—ClaimBack MCP never sends an email autonomously.
 - **DPDP Act Aligned:** Patient identifiers are masked before LLM processing, documents are stored encrypted on AWS S3, and users have 1-click delete control.
 - **Disclaimer:** ClaimBack MCP is a clause-backed audit and appeal-drafting helper, **not formal legal advice**. All escalation decisions remain 100% with the policyholder.
-
 ---
 ## 👥 Team Diet Code
