@@ -133,5 +133,4 @@ python -m mcp_server.server
 - **Disclaimer:** ClaimBack MCP is a clause-backed audit and appeal-drafting helper, **not formal legal advice**. All escalation decisions remain 100% with the policyholder.
 
 ---
-
 ## 👥 Team Diet Code
