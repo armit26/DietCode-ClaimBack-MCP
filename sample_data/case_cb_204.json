@@ -1,0 +1,49 @@
+{
+  "case_id": "CB-204",
+  "policyholder": {
+    "name": "Rajesh Sharma",
+    "policy_number": "SH-IND-2020-88412",
+    "insurer": "Sample Health Insurance Co.",
+    "gro_email": "gro@samplehealthinsurer.in",
+    "preferred_language": "en"
+  },
+  "drive_policy_history": {
+    "source": "Google Drive MCP (Read-Only Scope)",
+    "initial_inception_date": "2020-05-10",
+    "initial_sum_insured_inr": 1000000,
+    "sum_insured_enhanced": false,
+    "ported_or_migrated_months": 0,
+    "continuous_renewals": [
+      { "year": "2020-2021", "file": "Policy_2020_Original.pdf", "status": "Active" },
+      { "year": "2021-2022", "file": "Renewal_Receipt_2021.pdf", "status": "Active" },
+      { "year": "2022-2023", "file": "Renewal_Receipt_2022.pdf", "status": "Active" },
+      { "year": "2023-2024", "file": "Renewal_Receipt_2023.pdf", "status": "Active" },
+      { "year": "2024-2025", "file": "Renewal_Receipt_2024.pdf", "status": "Active" },
+      { "year": "2025-2026", "file": "Renewal_Receipt_2025.pdf", "status": "Active" }
+    ]
+  },
+  "rejection_email": {
+    "source": "Gmail MCP (Read-Only Scope)",
+    "claim_date": "2026-11-18",
+    "claim_type": "cashless",
+    "claim_action": "repudiated",
+    "claimed_amount_inr": 785000,
+    "denial_reason": "Alleged undisclosed pre-existing hypertension/cardiac condition",
+    "fraud_proven": false,
+    "is_permanent_exclusion": false,
+    "pmc_or_crc_approval_attached": false,
+    "specific_policy_clauses_cited": false,
+    "cashless_request_hours_taken": 2.5,
+    "discharge_approval_hours_taken": 5.5,
+    "reimbursement_days_since_submission": 0
+  },
+  "hospital_bill_items": [
+    { "id": 1, "date": "2026-11-15", "description": "ICU Bed & Nursing Charges - Day 1", "amount_inr": 18500 },
+    { "id": 2, "date": "2026-11-15", "description": "Cardiac Catheterization Procedure", "amount_inr": 145000 },
+    { "id": 3, "date": "2026-11-15", "description": "Surgical Disposable Kit - Ward", "amount_inr": 6400 },
+    { "id": 4, "date": "2026-11-15", "description": "Surgical Disposable Kit (Ward)", "amount_inr": 6400 },
+    { "id": 5, "date": "2026-11-16", "description": "ECG Monitoring Charges", "amount_inr": 2200 },
+    { "id": 6, "date": "2026-11-16", "description": "ECG Monitoring Charge", "amount_inr": 2200 },
+    { "id": 7, "date": "2026-11-16", "description": "Pharmacy & IV Antibiotics Batch A", "amount_inr": 14800 }
+  ]
+}

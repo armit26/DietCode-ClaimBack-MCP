@@ -1,0 +1,73 @@
+{
+  "regulation_sources": [
+    "IRDAI Master Circular on Protection of Policyholders' Interests, 2024 (IRDAI/PP&GR/CIR/MISC/117/9/2024, dated 5 September 2024)",
+    "IRDAI Master Circular on Health Insurance Business (IRDAI/HLT/CIR/PRO/84/5/2024, dated 29 May 2024)",
+    "IRDAI (Insurance Products) Regulations, 2024 (Schedule III — Health Insurance Products)"
+  ],
+  "version": "2024.3-verified",
+  "rules": [
+    {
+      "rule_id": "IRDAI_CASHLESS_1HR",
+      "name": "Cashless Initial Authorization TAT",
+      "threshold_hours": 1,
+      "citation": "IRDAI Master Circular on Protection of Policyholders' Interests (5 Sep 2024), Section I, Part B, V.3(i), 1(i)",
+      "summary": "Insurers must decide on initial cashless authorization requests immediately and in not more than 1 hour from receipt of the request."
+    },
+    {
+      "rule_id": "IRDAI_DISCHARGE_3HR",
+      "name": "Final Discharge Authorization TAT",
+      "threshold_hours": 3,
+      "citation": "IRDAI Master Circular on Protection of Policyholders' Interests (5 Sep 2024), Section I, Part B, V.3(i), 2(i)–(ii)",
+      "summary": "Final cashless discharge authorization must be granted within 3 hours of receiving the hospital's discharge request; any extra hospital charges resulting from insurer delay beyond 3 hours must be borne by the insurer from shareholders' funds."
+    },
+    {
+      "rule_id": "IRDAI_REIMBURSEMENT_15D",
+      "name": "Settlement of Non-Cashless Claims & Penal Interest",
+      "threshold_days": 15,
+      "penal_interest": {
+        "rate": "Bank rate + 2%",
+        "trigger": "Claim not settled within the specified timeline",
+        "calculation_basis": "From the date of receipt of claim intimation until the date of payment",
+        "payment_mode": "Paid automatically (suo motu) by the insurer along with the claim amount"
+      },
+      "citation": "IRDAI Master Circular on Protection of Policyholders' Interests (5 Sep 2024), Section I, Part B, V.2(ii) & V.3(iii)(6)",
+      "summary": "Settlement of claims other than cashless claims shall be completed within 15 days from submission of the claim. If not settled within the specified timeline, the insurer must automatically (suo motu) pay interest at bank rate + 2% from the date of receipt of claim intimation until the date of payment."
+    },
+    {
+      "rule_id": "IRDAI_MORATORIUM_60M",
+      "name": "60-Month (5-Year) Moratorium Shield",
+      "threshold_months": 60,
+      "regulatory_exception": "Established fraud only",
+      "scope_note": "Permanent policy exclusions are a separate contractual matter: the moratorium does not convert an excluded treatment or condition into a covered benefit.",
+      "citation": "IRDAI (Insurance Products) Regulations, 2024, Schedule III, Para 8 & Master Circular on Health Insurance Business (29 May 2024), Chapter I, Para 13",
+      "summary": "After 60 continuous months of coverage (including accrued credits from ported and migrated policies), no health policy or claim is contestable on grounds of non-disclosure or misrepresentation except for established fraud. Applies to the sum insured of the first policy; if enhanced, a separate 60-month moratorium applies to the enhanced portion from the date of enhancement."
+    },
+    {
+      "rule_id": "IRDAI_PMC_CRC_REPUDIATION",
+      "name": "PMC / CRC Approval for Repudiation & Reasoned Communication",
+      "repudiation_requirement": "No claim shall be repudiated without the approval of the Product Management Committee (PMC) or a three-member sub-group of the PMC called the Claims Review Committee (CRC).",
+      "communication_requirement": "Whenever a claim is repudiated, rejected, or partially disallowed, full written details must be communicated to the claimant referencing the specific terms and conditions of the policy document.",
+      "citation": "IRDAI Master Circular on Protection of Policyholders' Interests (5 Sep 2024), Section I, Part B, V.3(iii) & Master Circular on Health Insurance Business (29 May 2024), Chapter I, Para 17",
+      "summary": "Claim repudiation requires prior approval from either the PMC or its three-member CRC sub-group. Separately, any repudiated, rejected, or partially disallowed claim must be communicated in writing with full details citing specific policy terms and conditions."
+    }
+  ],
+  "escalation_ladder": {
+    "insurer_gro": {
+      "authority": "Insurer Grievance Redressal Officer (GRO)",
+      "resolution_sla_days": 14,
+      "note": "Insurers must acknowledge grievances immediately and resolve them within 14 days with written reasons referencing specific policy terms."
+    },
+    "bima_bharosa": {
+      "authority": "IRDAI Bima Bharosa Portal (bimabharosa.irdai.gov.in)",
+      "direct_registration_permitted": true,
+      "resolution_sla_days": 14,
+      "note": "Policyholders may register complaints directly on Bima Bharosa (no 14-day waiting period required); insurers mirror grievances on Bima Bharosa and must resolve them within 14 days."
+    },
+    "insurance_ombudsman": {
+      "authority": "Insurance Ombudsman (cioins.co.in)",
+      "max_claim_limit_inr": 5000000,
+      "prerequisite": "Prior written representation to the insurer",
+      "trigger": "Unsatisfactory insurer decision or no response within 30 days of written representation to the insurer (within 1 year, for claims up to ₹50 Lakh)."
+    }
+  }
+}
