@@ -3,7 +3,7 @@
 
 [![Track](https://img.shields.io/badge/Track%201-Make%20MCP%20Matter-C2410C?style=flat-square)](https://github.com/armit26/DietCode-ClaimBack-MCP)
 [![Stack](https://img.shields.io/badge/Core-FastMCP%20%7C%20AWS%20%7C%20ElevenLabs-15803D?style=flat-square)](https://github.com/armit26/DietCode-ClaimBack-MCP)
-[![Status](https://img.shields.io/badge/Status-Runnable%20Ideathon%20Prototype-FD9B36?style=flat-square)](https://github.com/armit26/DietCode-ClaimBack-MCP)
+[![Status](https://img.shields.io/badge/wHACKiest%202026-Online%20Ideathon%20Shortlisted-1A1E66?style=flat-square)](https://github.com/armit26/DietCode-ClaimBack-MCP)
 
 > **Team Diet Code**
 > *Built for wHACKiest 2026 — Track 1: Make MCP Matter (Less Magic, More Utility)*
@@ -67,7 +67,7 @@ Next.js · Tailwind · OAuth       FastAPI · FastMCP (AWS Lambda)         STRIC
 
 ---
 
-## 🚀 Quick Start (Run the Core Prototype Locally)
+## 🚀 Quick Start (Run the Live Prototype Locally)
 
 ```bash
 git clone [https://github.com/armit26/DietCode-ClaimBack-MCP.git](https://github.com/armit26/DietCode-ClaimBack-MCP.git)
@@ -77,10 +77,14 @@ python3 -m venv .venv
 source .venv/bin/activate        # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 
-# 1. Run the interactive IRDAI 2024 audit + RapidFuzz + HITL approval demo
+# 1. Launch the interactive web app (FastAPI + live IRDAI Audit Card & What-If simulator)
+uvicorn api:app --reload
+# Open [http://127.0.0.1:8000](http://127.0.0.1:8000) in your browser
+
+# 2. Or run the interactive CLI audit + RapidFuzz + HITL approval demo
 python demo_run.py
 
-# 2. Launch the 4-tool Python FastMCP server
+# 3. Launch the 4-tool Python FastMCP server
 python -m mcp_server.server
 ```
 
@@ -90,20 +94,22 @@ python -m mcp_server.server
 
 | Layer | Technology / API | Purpose |
 | :--- | :--- | :--- |
-| **Frontend** | Next.js + Tailwind CSS | Responsive web app for phone/laptop use right at the hospital desk |
+| **Frontend** | Tailwind CSS (Live Demo) · Next.js (Prod) | Responsive web app for phone/laptop use right at the hospital desk |
 | **MCP Layer** | Python FastMCP SDK + Google OAuth 2.0 | Standard tool bridge to Gmail, Drive & Calendar with read/draft-only scopes |
-| **Backend & Cloud** | FastAPI (Python) on AWS Lambda + API Gateway | Serverless execution hosting our 4 MCP tools |
+| **Backend & Cloud** | FastAPI (Python) on AWS Lambda + API Gateway | Serverless execution hosting our 4 MCP tools & REST bridge |
 | **Document Parsing** | AWS Textract + PyMuPDF + RapidFuzz | Extracts multi-column hospital bills & catches duplicate line items |
 | **AI & IRDAI Rules** | Claude API + IRDAI 2024 JSON + Pydantic | AI structures messy clauses; deterministic Python rules verify the law |
-| **Voice Co-Pilot** | ElevenLabs Multilingual v2 TTS | Calm 30s spoken rights briefs in English, Hindi & Kannada |
+| **Voice Co-Pilot** | ElevenLabs Multilingual v2 TTS | Calm 30s spoken rights briefs in English, Hindi & Kannada (with offline fallback) |
 | **Database & Privacy** | AWS S3 (SSE-KMS) + DynamoDB + Microsoft Presidio | Masks patient IDs before AI calls, encrypts files & logs user approvals |
 
 ---
 
-## 📂 Repository Structure & Ideathon Build Status
-> *In line with wHACKiest 2026 guidelines, this repository contains a runnable core prototype and will continue to be expanded through the **26–27 Nov Ideation presentation**.*
+## 📂 Repository Structure & Online Ideathon Build
+> *Shortlisted from Round 1 for the **wHACKiest 2026 Online Ideathon** — expanded with a live FastAPI bridge and interactive web demo ahead of panel evaluation.*
 
 ```text
+├── frontend/
+│   └── index.html                 # Interactive Red/Green Audit Card, What-If simulator & HITL UI
 ├── rules/
 │   └── irdai_2024_rules.json      # Verified IRDAI May & Sep 2024 rulebook & citations
 ├── mcp_server/
@@ -112,6 +118,7 @@ python -m mcp_server.server
 │   └── server.py                  # Python FastMCP server exposing all 4 scoped tools
 ├── sample_data/
 │   └── case_cb_204.json           # End-to-end test case (72-mo moratorium + ₹8,600 dupes)
+├── api.py                         # FastAPI bridge connecting the web UI to FastMCP & auditor.py
 ├── demo_run.py                    # 1-command interactive CLI prototype with HITL gate
 ├── requirements.txt
 ├── .gitignore
@@ -123,7 +130,7 @@ python -m mcp_server.server
 - [x] `rules/irdai_2024_rules.json` — Verified 5-rule IRDAI 2024 dataset with exact circular citations
 - [x] `mcp_server/` — Working Python `FastMCP` server with 4 tools & `RapidFuzz` duplicate bill detector
 - [x] `sample_data/case_cb_204.json` + `demo_run.py` — End-to-end runnable HITL audit prototype
-- [ ] `frontend/` — Interactive Next.js Red/Green Audit Card + live ElevenLabs audio playback *(in progress for Nov 26–27 Ideation Day)*
+- [x] `api.py` & `frontend/index.html` — Live interactive Red/Green Audit Card, What-If rule simulator, MCP Tools inspector, voice brief & HITL approval gate
 
 ---
 
@@ -131,5 +138,7 @@ python -m mcp_server.server
 - **Strict Human-in-the-Loop (HITL):** Gmail MCP is scoped to save **editable drafts only**—ClaimBack MCP never sends an email autonomously.
 - **DPDP Act Aligned:** Patient identifiers are masked before LLM processing, documents are stored encrypted on AWS S3, and users have 1-click delete control.
 - **Disclaimer:** ClaimBack MCP is a clause-backed audit and appeal-drafting helper, **not formal legal advice**. All escalation decisions remain 100% with the policyholder.
+
 ---
+
 ## 👥 Team Diet Code

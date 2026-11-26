@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ClaimBack Audit · Case #CB-204</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: #F4F6FA;
+      background-image:
+        radial-gradient(at 10% 0%, rgba(26, 30, 102, 0.05) 0px, transparent 42%),
+        radial-gradient(at 92% 6%, rgba(21, 128, 61, 0.05) 0px, transparent 40%);
+      color: #111827;
+      -webkit-font-smoothing: antialiased;
+    }
+    .font-mono-cb { font-family: 'JetBrains Mono', monospace; }
+    .cb-card-shadow {
+      box-shadow:
+        0 1px 2px rgba(17, 24, 39, 0.04),
+        0 18px 44px -16px rgba(26, 30, 102, 0.12);
+    }
+    @keyframes popIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .pop-in {
+      animation: popIn 0.28s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+    input[type="range"].cb-range {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 5px;
+      border-radius: 999px;
+      background: #E5E7EB;
+      outline: none;
+    }
+    input[type="range"].cb-range::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #1A1E66;
+      border: 3px solid #FFFFFF;
+      box-shadow: 0 2px 6px rgba(26, 30, 102, 0.3);
+      cursor: pointer;
+    }
+    .eq-bar {
+      width: 3px;
+      height: 6px;
+      border-radius: 999px;
+      background: #C2410C;
+      transition: height 0.18s ease;
+    }
+    .audio-active .eq-bar { animation: eqPulse 0.8s infinite ease-in-out; }
+    .audio-active .eq-bar:nth-child(2) { animation-delay: 0.15s; }
+    .audio-active .eq-bar:nth-child(3) { animation-delay: 0.30s; }
+    .audio-active .eq-bar:nth-child(4) { animation-delay: 0.10s; }
+    @keyframes eqPulse {
+      0%, 100% { height: 5px; }
+      50% { height: 16px; }
+    }
+    .soft-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
+    .soft-scroll::-webkit-scrollbar-track { background: transparent; }
+    .soft-scroll::-webkit-scrollbar-thumb { background: #D1D5DB; border-radius: 999px; }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+  <!-- Full-Width Top Navigation Bar -->
+  <header class="w-full bg-white/90 backdrop-blur border-b border-gray-200/80 sticky top-0 z-30">
+    <div class="w-full max-w-[1600px] mx-auto px-5 lg:px-8 h-16 flex items-center justify-between gap-4">
+      <!-- Brand -->
+      <div class="flex items-center gap-3">
+        <div class="h-9 w-9 rounded-full bg-[#EAFBF0] flex items-center justify-center shrink-0">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <path d="M12 2L4 5.5V11.5C4 16.8 7.4 21.6 12 23C16.6 21.6 20 16.8 20 11.5V5.5L12 2Z" fill="#15803D"/>
+            <path d="M12 3.8V21.1C15.6 19.8 18.2 15.9 18.2 11.5V6.6L12 3.8Z" fill="#22C55E" opacity="0.45"/>
+            <path d="M8.8 12.3L11 14.5L15.6 9.8" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="flex items-center gap-2.5">
+          <span class="font-extrabold text-[17px] tracking-tight text-[#1A1E66]">ClaimBack MCP</span>
+          <span class="hidden sm:inline-block text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-[#EEF2FF] text-[#1A1E66]">
+            Team Diet Code · Track 1
+          </span>
+        </div>
+      </div>
+
+      <!-- Center Live Scoped MCP Pills -->
+      <div class="hidden xl:flex items-center gap-2 text-[11.5px] font-semibold text-gray-600">
+        <span class="px-3 py-1.5 rounded-full bg-[#F8FAFC] border border-gray-200/80 flex items-center gap-1.5">
+          <span class="h-2 w-2 rounded-full bg-[#15803D]"></span>Drive MCP: Read-Only
+        </span>
+        <span class="px-3 py-1.5 rounded-full bg-[#F8FAFC] border border-gray-200/80 flex items-center gap-1.5">
+          <span class="h-2 w-2 rounded-full bg-[#D97706]"></span>Gmail MCP: Draft-Only
+        </span>
+        <span class="px-3 py-1.5 rounded-full bg-[#F8FAFC] border border-gray-200/80 flex items-center gap-1.5">
+          <span class="h-2 w-2 rounded-full bg-[#1A1E66]"></span>Calendar MCP: SLA Clocks
+        </span>
+      </div>
+
+      <!-- Action Controls -->
+      <div class="flex items-center gap-2">
+        <button onclick="runLiveScanAnimation()" class="text-xs font-bold px-3.5 py-2 rounded-full bg-[#EAFBF0] hover:bg-[#DCFCE7] text-[#15803D] border border-[#BBF7D0] transition flex items-center gap-1.5">
+          <span class="h-2 w-2 rounded-full bg-[#15803D] animate-pulse"></span>
+          Live MCP Sync
+        </button>
+        <button onclick="toggleMcpModal()" class="text-xs font-bold px-3.5 py-2 rounded-full bg-white hover:bg-[#EEF2FF] text-[#1A1E66] border border-[#C7D2FE] transition">
+          MCP Tools (4)
+        </button>
+        <button onclick="openPrivacyModal()" class="text-xs font-bold px-3.5 py-2 rounded-full bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 transition">
+          PII Masked
+        </button>
+        <button onclick="toggleSimulator()" class="text-xs font-bold px-3.5 py-2 rounded-full bg-[#1A1E66] hover:bg-[#131652] text-white transition">
+          What-If Test
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Live MCP Sync Toast -->
+  <div id="sync-banner" class="hidden w-full max-w-[1600px] mx-auto px-5 lg:px-8 pt-4">
+    <div class="bg-[#1A1E66] text-white rounded-2xl px-5 py-3 text-xs font-semibold flex items-center justify-between shadow-md">
+      <div class="flex items-center gap-3">
+        <svg class="animate-spin h-4 w-4 text-emerald-300" viewBox="0 0 24 24" fill="none">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3"></circle>
+          <path class="opacity-90" fill="currentColor" d="M4 12a8 8 0 018-8v3a5 5 0 00-5 5H4z"></path>
+        </svg>
+        <span id="sync-step-text">Connecting FastMCP tools...</span>
+      </div>
+      <span class="text-[11px] text-indigo-200">Zero Autonomous Sending Enforced</span>
+    </div>
+  </div>
+
+  <!-- FULL-SCREEN WIDESCREEN 2-PANE WORKSPACE -->
+  <main class="flex-1 w-full max-w-[1600px] mx-auto px-5 lg:px-8 py-6">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+      <!-- LEFT PANE (7 Cols): THE EXACT PPT AUDIT CARD + 6-YR DRIVE CHAIN -->
+      <div class="lg:col-span-7 space-y-5">
+
+        <section class="bg-white rounded-[26px] p-6 sm:p-7 cb-card-shadow border border-white space-y-4">
+
+          <!-- Card Header (Exact PPT Match) -->
+          <div class="flex items-start justify-between gap-4 pb-1">
+            <div class="flex items-start gap-3">
+              <div class="mt-0.5 shrink-0">
+                <svg width="30" height="30" viewBox="0 0 24 24" fill="none">
+                  <path d="M12 2L4 5.5V11.5C4 16.8 7.4 21.6 12 23C16.6 21.6 20 16.8 20 11.5V5.5L12 2Z" fill="#15803D"/>
+                  <path d="M12 3.8V21.1C15.6 19.8 18.2 15.9 18.2 11.5V6.6L12 3.8Z" fill="#4ADE80" opacity="0.38"/>
+                </svg>
+              </div>
+              <div>
+                <h1 class="text-[24px] sm:text-[27px] font-extrabold text-[#1A1E66] tracking-tight leading-tight">
+                  ClaimBack Audit · Case <span id="card-case-id">#CB-204</span>
+                </h1>
+                <p class="text-xs sm:text-[13px] font-medium text-gray-500 mt-0.5">
+                  <span id="card-patient">Rajesh Sharma</span> · <span id="card-insurer">Sample Health Insurance Co.</span> · Policy <span id="card-policy">—</span>
+                </p>
+              </div>
+            </div>
+
+            <div id="hitl-top-status" class="shrink-0 text-right pt-1">
+              <span class="inline-flex items-center gap-1.5 text-[12px] sm:text-[13px] font-extrabold tracking-wide text-[#15803D]">
+                <span class="h-2 w-2 rounded-full bg-[#15803D]"></span>
+                HITL GATE LOCKED
+              </span>
+            </div>
+          </div>
+
+          <!-- ROW 1: RED INSURER REJECTION · GMAIL MCP -->
+          <button onclick="focusEvidenceTab('bill')" id="card-red-row" class="w-full text-left rounded-[16px] bg-[#FFF1F1] hover:bg-[#FFE8E8] border-2 border-[#FEE2E2] px-5 py-4 transition flex items-center justify-between gap-4 group">
+            <div class="space-y-1">
+              <div class="text-[11.5px] font-extrabold uppercase tracking-wider text-[#B91C1C]">
+                INSURER REJECTION · GMAIL MCP
+              </div>
+              <div id="red-headline" class="text-[18px] sm:text-[20px] font-bold text-[#111827] leading-snug">
+                ₹7.85L denied: Alleged undisclosed pre-existing illness.
+              </div>
+              <div id="red-subline" class="text-xs font-semibold text-[#991B1B]/80">
+                + ₹8,600 duplicate hospital bill charges flagged by RapidFuzz → Inspect bill on right
+              </div>
+            </div>
+            <span class="text-xs font-bold text-[#B91C1C] bg-white/80 px-3 py-1.5 rounded-full shrink-0 group-hover:bg-white transition">
+              View Bill →
+            </span>
+          </button>
+
+          <!-- ROW 2: GREEN IRDAI 2024 BREACH · DRIVE MCP -->
+          <button onclick="focusEvidenceTab('rules')" id="card-green-row" class="w-full text-left rounded-[16px] bg-[#EAFBF0] hover:bg-[#E0F7E8] border-2 border-[#BBF7D0] px-5 py-4 transition flex items-center justify-between gap-4 group">
+            <div class="space-y-1">
+              <div class="text-[11.5px] font-extrabold uppercase tracking-wider text-[#15803D]">
+                IRDAI 2024 BREACH · DRIVE MCP
+              </div>
+              <div id="green-headline" class="text-[18px] sm:text-[20px] font-bold text-[#111827] leading-snug">
+                6-yr renewals found → 60-Mo Moratorium violated.
+              </div>
+              <div id="green-subline" class="text-xs font-semibold text-[#166534]/80">
+                4 deterministic IRDAI 2024 Master Circular breaches verified → Inspect clauses on right
+              </div>
+            </div>
+            <span class="text-xs font-bold text-[#15803D] bg-white/80 px-3 py-1.5 rounded-full shrink-0 group-hover:bg-white transition">
+              4 Clauses →
+            </span>
+          </button>
+
+          <!-- ROW 3: WARM ORANGE ELEVENLABS AUDIO BRIEF (With Honest Fallback Label) -->
+          <div class="rounded-[16px] bg-[#FFF7EB] border border-[#FDE6C4] px-5 py-4 space-y-3">
+            <div class="flex flex-wrap items-center justify-between gap-3">
+              <button onclick="toggleAudio()" class="flex items-center gap-3 text-left group">
+                <div class="h-10 w-10 rounded-full bg-[#C2410C] group-hover:bg-[#9A3412] text-white flex items-center justify-center shrink-0 transition shadow-sm">
+                  <svg id="audio-svg" width="17" height="17" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M11 5L6 9H2v6h4l5 4V5z"/>
+                    <path d="M15.54 8.46a5 5 0 0 1 0 7.07" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+                    <path d="M19.07 4.93a10 10 0 0 1 0 14.14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+                  </svg>
+                </div>
+                <div>
+                  <div class="flex items-center gap-2.5">
+                    <span class="text-[16.5px] font-bold text-[#B45309]">ElevenLabs Audio Brief</span>
+                    <div id="eq-bars" class="flex items-center gap-[2.5px] h-4">
+                      <span class="eq-bar"></span><span class="eq-bar"></span><span class="eq-bar"></span><span class="eq-bar"></span>
+                    </div>
+                  </div>
+                  <div id="audio-status-sub" class="text-[11px] font-semibold text-[#92400E]/85">
+                    ElevenLabs Multilingual v2 · Offline Web-Speech Fallback · Tap to play
+                  </div>
+                </div>
+              </button>
+
+              <!-- Exact PPT Language Selector -->
+              <div class="flex items-center gap-1 text-[14px] font-bold text-[#1F2937]">
+                <button onclick="setLang('EN')" id="lbtn-EN" class="px-2.5 py-1 rounded-lg bg-[#FDE6C4] text-[#9A3412] transition">EN</button>
+                <span class="text-[#D97706]/60">·</span>
+                <button onclick="setLang('HI')" id="lbtn-HI" class="px-2.5 py-1 rounded-lg hover:bg-[#FDE6C4]/60 text-[#374151] transition">हिंदी</button>
+                <span class="text-[#D97706]/60">·</span>
+                <button onclick="setLang('KN')" id="lbtn-KN" class="px-2.5 py-1 rounded-lg hover:bg-[#FDE6C4]/60 text-[#374151] transition">ಕನ್ನಡ</button>
+                <span id="audio-timer" class="ml-1.5 text-xs font-semibold text-[#92400E]">(0:28)</span>
+              </div>
+            </div>
+
+            <div class="space-y-2">
+              <div class="w-full h-1.5 rounded-full bg-[#FDE6C4] overflow-hidden">
+                <div id="audio-progress" class="h-full bg-[#C2410C] rounded-full transition-all duration-300" style="width: 0%;"></div>
+              </div>
+              <p id="audio-transcript" class="text-[12.5px] text-[#78350F] leading-relaxed font-medium"></p>
+            </div>
+          </div>
+
+          <!-- ROW 4: BIG NAVY APPROVE BUTTON + GREY EDIT BUTTON -->
+          <div class="pt-1 flex items-center gap-3">
+            <button id="approve-cta" onclick="approveAndGenerate()" class="flex-1 py-4 px-6 rounded-[15px] bg-[#1A1E66] hover:bg-[#131652] active:scale-[0.995] text-white font-bold text-[16px] sm:text-[17.5px] transition flex items-center justify-center gap-2.5 shadow-md">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+              <span id="approve-cta-label">Approve Gmail Draft + 14-Day Clock</span>
+            </button>
+
+            <button onclick="handleEditClick()" class="py-4 px-7 rounded-[15px] bg-[#F3F4F6] hover:bg-[#E5E7EB] text-[#1F2937] font-bold text-[16px] transition shrink-0">
+              Edit
+            </button>
+          </div>
+        </section>
+
+        <!-- Compact 6-Year Google Drive Renewal Verification Strip -->
+        <section class="bg-white rounded-[22px] p-5 cb-card-shadow border border-white">
+          <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+            <div class="flex items-center gap-2">
+              <span class="h-2.5 w-2.5 rounded-full bg-[#15803D]"></span>
+              <h2 class="text-xs font-extrabold uppercase tracking-wider text-[#1A1E66]">Google Drive MCP · Continuous Renewal Verification</h2>
+            </div>
+            <span id="drive-months-pill" class="text-xs font-extrabold px-2.5 py-0.5 rounded-full bg-[#EAFBF0] text-[#15803D]">
+              72 Continuous Months · Moratorium Protected
+            </span>
+          </div>
+          <div id="renewal-pills" class="grid grid-cols-3 sm:grid-cols-6 gap-2"></div>
+        </section>
+
+      </div>
+
+      <!-- RIGHT PANE (5 Cols): LIVE EVIDENCE INSPECTOR + SIDE-BY-SIDE HITL DRAFT / SLA PANEL -->
+      <div class="lg:col-span-5 space-y-5">
+
+        <section class="bg-white rounded-[26px] cb-card-shadow border border-white overflow-hidden">
+          <!-- Tab Bar -->
+          <div class="px-5 pt-4 pb-3 border-b border-gray-100 flex items-center justify-between gap-2 flex-wrap">
+            <div class="inline-flex bg-[#F3F4F6] p-1 rounded-xl text-xs font-bold">
+              <button onclick="focusEvidenceTab('rules')" id="rtab-rules" class="px-3.5 py-1.5 rounded-lg bg-white text-[#1A1E66] shadow-2xs transition">
+                IRDAI Clauses (<span id="tab-breach-num">4</span>)
+              </button>
+              <button onclick="focusEvidenceTab('bill')" id="rtab-bill" class="px-3.5 py-1.5 rounded-lg text-gray-500 hover:text-gray-900 transition">
+                Bill Audit (₹8.6k)
+              </button>
+              <button onclick="focusEvidenceTab('draft')" id="rtab-draft" class="px-3.5 py-1.5 rounded-lg text-gray-500 hover:text-gray-900 transition flex items-center gap-1.5">
+                <span id="draft-tab-dot" class="h-1.5 w-1.5 rounded-full bg-[#B91C1C]"></span>
+                Draft & SLAs
+              </button>
+            </div>
+          </div>
+
+          <!-- TAB 1: 5 DETERMINISTIC IRDAI 2024 CLAUSES -->
+          <div id="pane-rules" class="p-5 space-y-2.5 max-h-[600px] overflow-y-auto soft-scroll">
+            <div class="flex items-center justify-between text-xs pb-1">
+              <span class="font-bold text-gray-500">Deterministic Python Engine · May & Sep 2024 Circulars</span>
+              <span id="rules-summary-badge" class="font-extrabold text-[#B91C1C]">4 VIOLATED</span>
+            </div>
+            <div id="irdai-clauses-list" class="space-y-2.5"></div>
+          </div>
+
+          <!-- TAB 2: RAPIDFUZZ HOSPITAL BILL AUDIT -->
+          <div id="pane-bill" class="hidden p-5 space-y-4 max-h-[600px] overflow-y-auto soft-scroll">
+            <div class="rounded-2xl bg-[#FFF1F1] border border-[#FECACA] p-4 flex items-center justify-between">
+              <div>
+                <div class="text-[11px] font-extrabold uppercase tracking-wider text-[#B91C1C]">RapidFuzz Duplicate Detection</div>
+                <div class="text-sm font-bold text-gray-900 mt-0.5">2 repeated consumable line items flagged</div>
+              </div>
+              <div id="bill-total-badge" class="text-xl font-extrabold text-[#B91C1C]">₹8,600</div>
+            </div>
+            <div id="dupe-list" class="space-y-2.5"></div>
+            <div class="pt-2 border-t border-gray-100">
+              <div class="text-[11px] font-extrabold uppercase tracking-wider text-gray-400 mb-2">Full Scanned Hospital Bill Items</div>
+              <div id="full-bill-list" class="divide-y divide-gray-100 text-xs"></div>
+            </div>
+          </div>
+
+          <!-- TAB 3: HITL LOCKED PREVIEW → UNLOCKS INTO GMAIL DRAFT & 3 CALENDAR SLAs -->
+          <div id="pane-draft" class="hidden p-5 space-y-4 max-h-[620px] overflow-y-auto soft-scroll">
+            <div id="draft-locked-state" class="rounded-2xl bg-[#F8FAFC] border-2 border-dashed border-gray-200 p-7 text-center space-y-3">
+              <div class="h-12 w-12 rounded-2xl bg-[#FFF1F1] text-[#B91C1C] mx-auto flex items-center justify-center">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                </svg>
+              </div>
+              <div class="text-xs font-extrabold uppercase tracking-wider text-[#B91C1C]">BLOCKED_BY_HITL_GATE</div>
+              <h3 class="text-base font-extrabold text-[#1A1E66]">Zero Autonomous Sending Enforced</h3>
+              <p class="text-xs text-gray-500 max-w-sm mx-auto leading-relaxed">
+                Click <strong>Approve Gmail Draft + 14-Day Clock</strong> on the left card to unlock your editable GRO grievance draft and schedule 3 Calendar SLA clocks.
+              </p>
+              <button onclick="approveAndGenerate()" class="mt-1 px-5 py-2.5 rounded-xl bg-[#1A1E66] hover:bg-[#131652] text-white text-xs font-bold transition">
+                Authorize & Unlock Now
+              </button>
+            </div>
+
+            <div id="draft-unlocked-state" class="hidden space-y-4 pop-in">
+              <div class="rounded-2xl border border-gray-200 overflow-hidden">
+                <div class="bg-[#1A1E66] text-white px-4 py-3 flex items-center justify-between gap-2">
+                  <div class="flex items-center gap-2">
+                    <span class="text-xs font-bold">Gmail Draft · GRO Appeal</span>
+                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-400/20 text-emerald-200">DRAFT ONLY</span>
+                  </div>
+                  <button id="copy-draft-btn" onclick="copyDraft()" class="text-[11px] font-bold px-3 py-1 rounded-full bg-white/15 hover:bg-white/25 transition">
+                    Copy Draft
+                  </button>
+                </div>
+                <div class="px-4 py-2 border-b border-gray-100 text-[11.5px] flex items-center gap-2 bg-white">
+                  <span class="font-bold text-gray-400">To:</span>
+                  <span id="draft-to" class="font-bold text-[#1A1E66] bg-[#EEF2FF] px-2 py-0.5 rounded-full"></span>
+                </div>
+                <div class="px-4 py-2 border-b border-gray-100 text-[11.5px] flex items-center gap-2 bg-white">
+                  <span class="font-bold text-gray-400">Subject:</span>
+                  <span id="draft-subject" class="font-bold text-gray-900 truncate"></span>
+                </div>
+                <textarea id="draft-body" rows="9" class="w-full p-4 text-xs text-gray-800 leading-relaxed focus:outline-none bg-[#FCFCFD] font-medium resize-y"></textarea>
+              </div>
+
+              <div class="space-y-2">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-extrabold text-[#1A1E66]">Calendar MCP · 3 SLA Clocks Active</span>
+                  <span class="text-[10.5px] font-bold text-[#15803D]">✓ Scheduled</span>
+                </div>
+                <div id="sla-cards" class="space-y-2"></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </div>
+
+    </div>
+
+    <!-- Safe Positioning Footer -->
+    <footer class="mt-6 pt-4 border-t border-gray-200/70 flex flex-wrap items-center justify-between gap-2 text-[11.5px] text-gray-400 font-medium">
+      <span>ClaimBack MCP is a clause-backed health insurance audit and appeal-drafting assistant, not formal legal advice.</span>
+      <span>Policyholders can also register complaints directly on IRDAI's Bima Bharosa portal anytime.</span>
+    </footer>
+  </main>
+
+  <!-- SLIDE-OVER "WHAT-IF" LIVE EDGE-CASE SIMULATOR -->
+  <div id="sim-backdrop" onclick="toggleSimulator()" class="hidden fixed inset-0 z-40 bg-[#1A1E66]/20 backdrop-blur-[2px]"></div>
+  <aside id="sim-drawer" class="fixed top-0 right-0 z-50 h-full w-full max-w-sm bg-white shadow-2xl border-l border-gray-200 transform translate-x-full transition-transform duration-300 flex flex-col">
+    <div class="px-6 py-5 border-b border-gray-100 flex items-center justify-between">
+      <div>
+        <h3 class="text-base font-extrabold text-[#1A1E66]">Live Rule Simulator</h3>
+        <p class="text-xs text-gray-500 mt-0.5">Test edge cases live against Python IRDAI rules</p>
+      </div>
+      <button onclick="toggleSimulator()" class="h-8 w-8 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold">✕</button>
+    </div>
+
+    <div class="p-6 space-y-6 flex-1 overflow-y-auto">
+      <div>
+        <div class="flex justify-between text-xs font-bold mb-2">
+          <span class="text-gray-700">Continuous Coverage (Drive MCP)</span>
+          <span id="sim-lbl-months" class="text-[#1A1E66]">72 months</span>
+        </div>
+        <input id="inp-months" type="range" min="12" max="96" step="12" value="72" oninput="onSimChange()" class="cb-range">
+        <p class="text-[11px] text-gray-400 mt-1.5">IRDAI 60-month Moratorium triggers at ≥ 60 months.</p>
+      </div>
+
+      <div>
+        <div class="flex justify-between text-xs font-bold mb-2">
+          <span class="text-gray-700">Cashless Initial Authorization</span>
+          <span id="sim-lbl-cashless" class="text-[#1A1E66]">2.5 hrs</span>
+        </div>
+        <input id="inp-cashless" type="range" min="0.5" max="6" step="0.5" value="2.5" oninput="onSimChange()" class="cb-range">
+        <p class="text-[11px] text-gray-400 mt-1.5">IRDAI limit: ≤ 1 hour.</p>
+      </div>
+
+      <div>
+        <div class="flex justify-between text-xs font-bold mb-2">
+          <span class="text-gray-700">Final Discharge Authorization</span>
+          <span id="sim-lbl-discharge" class="text-[#1A1E66]">5.5 hrs</span>
+        </div>
+        <input id="inp-discharge" type="range" min="1" max="10" step="0.5" value="5.5" oninput="onSimChange()" class="cb-range">
+        <p class="text-[11px] text-gray-400 mt-1.5">IRDAI limit: ≤ 3 hours.</p>
+      </div>
+
+      <div class="space-y-3 pt-2 border-t border-gray-100">
+        <label class="flex items-center justify-between p-3.5 rounded-xl bg-gray-50 cursor-pointer">
+          <div>
+            <div class="text-xs font-bold text-gray-800">PMC / CRC Approval Attached</div>
+            <div class="text-[11px] text-gray-500">Mandatory sign-off for repudiation</div>
+          </div>
+          <input id="inp-pmc" type="checkbox" onchange="onSimChange()" class="h-4 w-4 accent-[#1A1E66]">
+        </label>
+
+        <label class="flex items-center justify-between p-3.5 rounded-xl bg-gray-50 cursor-pointer">
+          <div>
+            <div class="text-xs font-bold text-gray-800">Policy Clauses Cited</div>
+            <div class="text-[11px] text-gray-500">Written denial cites specific terms</div>
+          </div>
+          <input id="inp-clauses" type="checkbox" onchange="onSimChange()" class="h-4 w-4 accent-[#1A1E66]">
+        </label>
+      </div>
+    </div>
+
+    <div class="p-5 border-t border-gray-100 flex gap-2.5">
+      <button onclick="resetSimulation()" class="flex-1 py-3 rounded-xl bg-gray-100 hover:bg-gray-200 text-xs font-bold text-gray-800 transition">
+        Reset #CB-204
+      </button>
+      <button onclick="toggleSimulator()" class="flex-1 py-3 rounded-xl bg-[#1A1E66] hover:bg-[#131652] text-xs font-bold text-white transition">
+        Done
+      </button>
+    </div>
+  </aside>
+
+  <!-- FASTMCP TOOLS & LIVE JSON INSPECTOR MODAL (Judge Track-1 Proof) -->
+  <div id="mcp-modal" onclick="if(event.target===this) toggleMcpModal()" class="hidden fixed inset-0 z-50 bg-[#1A1E66]/25 backdrop-blur-[2px] flex items-center justify-center p-4">
+    <div class="bg-white rounded-[24px] max-w-2xl w-full max-h-[88vh] flex flex-col shadow-2xl overflow-hidden pop-in">
+      <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+        <div>
+          <div class="flex items-center gap-2">
+            <h3 class="text-base font-extrabold text-[#1A1E66]">FastMCP Server · Registered Tools</h3>
+            <span id="mcp-server-badge" class="font-mono-cb text-[10.5px] font-semibold px-2.5 py-0.5 rounded-full bg-[#EAFBF0] text-[#15803D]">
+              mcp_server/server.py
+            </span>
+          </div>
+          <p class="text-xs text-gray-500 mt-0.5">4 least-privilege @mcp.tool() endpoints with deterministic Python execution</p>
+        </div>
+        <button onclick="toggleMcpModal()" class="h-8 w-8 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold">✕</button>
+      </div>
+
+      <div class="p-6 space-y-4 overflow-y-auto soft-scroll">
+        <!-- 4 Registered FastMCP Tools Grid -->
+        <div id="mcp-tools-list" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
+
+        <!-- Sponsor Cloud & Voice Stack Strip -->
+        <div class="rounded-2xl bg-[#EEF2FF]/70 border border-[#C7D2FE] px-4 py-3 flex flex-wrap items-center justify-between gap-2 text-xs">
+          <div class="font-bold text-[#1A1E66]">Production Cloud & Voice Stack</div>
+          <div class="text-gray-700 font-semibold">
+            AWS Lambda · AWS Textract · AWS S3 (Encrypted, 1-Click DPDP Delete) · ElevenLabs Multilingual v2
+          </div>
+        </div>
+
+        <!-- Live JSON Output from Current Audit -->
+        <div class="space-y-1.5">
+          <div class="flex items-center justify-between">
+            <span class="text-[11px] font-extrabold uppercase tracking-wider text-gray-500">Live irdai_rule_auditor() JSON Output</span>
+            <span class="font-mono-cb text-[10.5px] text-[#15803D] font-semibold">200 OK · Pydantic Validated</span>
+          </div>
+          <pre id="mcp-live-json" class="font-mono-cb text-[11px] bg-[#F8FAFC] border border-gray-200 rounded-2xl p-4 text-gray-800 max-h-56 overflow-auto soft-scroll leading-relaxed"></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PRIVACY / PII MASKING MODAL -->
+  <div id="pii-modal" onclick="if(event.target===this) openPrivacyModal()" class="hidden fixed inset-0 z-50 bg-[#1A1E66]/25 backdrop-blur-[2px] flex items-center justify-center p-4">
+    <div class="bg-white rounded-[24px] max-w-xl w-full p-6 shadow-2xl space-y-4 pop-in">
+      <div class="flex items-center justify-between">
+        <div>
+          <h3 class="text-base font-extrabold text-[#1A1E66]">DPDP-Aligned Local PII Masking</h3>
+          <p class="text-xs text-gray-500">Patient name & Policy ID are stripped locally before any LLM call</p>
+        </div>
+        <button onclick="openPrivacyModal()" class="h-8 w-8 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold">✕</button>
+      </div>
+      <div class="space-y-3">
+        <div class="rounded-2xl bg-[#FFF1F1] p-4 border border-[#FEE2E2]">
+          <div class="text-[11px] font-extrabold uppercase tracking-wider text-[#B91C1C] mb-1">On-Device Local Record (Never Sent Raw)</div>
+          <p id="pii-raw" class="text-xs font-medium text-gray-800 leading-relaxed break-words"></p>
+        </div>
+        <div class="rounded-2xl bg-[#EAFBF0] p-4 border border-[#D1F5DE]">
+          <div class="text-[11px] font-extrabold uppercase tracking-wider text-[#15803D] mb-1">Outbound Masked Payload (Safe for Claude)</div>
+          <p id="pii-masked" class="text-xs font-semibold text-[#14532D] leading-relaxed break-words"></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let caseData = null;
+    let currentAudit = null;
+    let currentLang = 'EN';
+    let isApproved = false;
+    let isPlaying = false;
+    let audioInterval = null;
+    let audioSeconds = 0;
+
+    const DEFAULT_AUDIO_SUB = 'ElevenLabs Multilingual v2 · Offline Web-Speech Fallback · Tap to play';
+
+    function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+    async function init() {
+      const ctxRes = await fetch('/api/case/CB-204');
+      const ctx = await ctxRes.json();
+      caseData = ctx.case;
+
+      const ph = caseData.policyholder;
+      document.getElementById('card-case-id').textContent = `#${caseData.case_id}`;
+      document.getElementById('card-patient').textContent = ph.name;
+      document.getElementById('card-insurer').textContent = ph.insurer;
+      document.getElementById('card-policy').textContent = ph.policy_number;
+      document.getElementById('pii-raw').textContent = ctx.pii_preview.raw;
+      document.getElementById('pii-masked').textContent = ctx.pii_preview.masked;
+
+      // Populate FastMCP Tools Modal directly from /api/case/CB-204
+      if (ctx.mcp_server_name) {
+        document.getElementById('mcp-server-badge').textContent = `${ctx.mcp_server_name} · server.py`;
+      }
+      document.getElementById('mcp-tools-list').innerHTML = (ctx.mcp_tools || []).map(t => `
+        <div class="rounded-2xl border border-gray-200/90 bg-[#F8FAFC] p-3.5 space-y-1.5">
+          <div class="flex items-center justify-between gap-2">
+            <span class="font-mono-cb text-xs font-semibold text-[#1A1E66]">@mcp.tool ${t.name}()</span>
+          </div>
+          <div>
+            <span class="font-mono-cb text-[10px] font-semibold px-2 py-0.5 rounded-full bg-white border border-gray-200 text-[#15803D]">
+              ${t.scope}
+            </span>
+          </div>
+          <p class="text-xs text-gray-600 leading-relaxed pt-0.5">${t.desc}</p>
+        </div>
+      `).join('');
+
+      await fetchAudit();
+    }
+
+    function getSimPayload() {
+      return {
+        case_id: 'CB-204',
+        coverage_months: parseInt(document.getElementById('inp-months').value, 10),
+        cashless_hours: parseFloat(document.getElementById('inp-cashless').value),
+        discharge_hours: parseFloat(document.getElementById('inp-discharge').value),
+        pmc_or_crc_attached: document.getElementById('inp-pmc').checked,
+        clauses_cited: document.getElementById('inp-clauses').checked,
+      };
+    }
+
+    async function fetchAudit() {
+      const res = await fetch('/api/audit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(getSimPayload()),
+      });
+      const data = await res.json();
+      currentAudit = data;
+      renderAudit(data);
+    }
+
+    function renderAudit(data) {
+      const rep = data.report;
+      const years = Math.round(rep.continuous_coverage_months / 12);
+      const amountLakhs = (rep.claimed_amount_inr / 100000).toFixed(2);
+      const bCount = rep.breaches.length;
+
+      // Update Live JSON inside MCP Tools Modal
+      const jsonSnapshot = {
+        tool: 'irdai_rule_auditor',
+        case_id: rep.case_id,
+        continuous_coverage_months: rep.continuous_coverage_months,
+        breaches_found: bCount,
+        violated_rules: rep.breaches.map(b => b.rule_id),
+        total_duplicate_overcharge_inr: rep.total_duplicate_overcharge_inr,
+        hitl_gate_status: isApproved ? 'APPROVED_DRAFT_ONLY' : 'BLOCKED_BY_HITL_GATE',
+      };
+      document.getElementById('mcp-live-json').textContent = JSON.stringify(jsonSnapshot, null, 2);
+
+      // Left Card Headlines
+      document.getElementById('red-headline').textContent = `₹${amountLakhs}L denied: Alleged undisclosed pre-existing illness.`;
+      document.getElementById('red-subline').textContent =
+        `+ ₹${rep.total_duplicate_overcharge_inr.toLocaleString('en-IN')} duplicate hospital bill charges flagged by RapidFuzz → Inspect bill on right`;
+
+      const moratoriumViolated = rep.breaches.some(b => b.rule_id === 'IRDAI_MORATORIUM_60M');
+      document.getElementById('green-headline').textContent = moratoriumViolated
+        ? `${years}-yr renewals found → 60-Mo Moratorium violated.`
+        : `${years}-yr renewals found → Below 60-Mo Moratorium (${bCount} other breach${bCount === 1 ? '' : 'es'}).`;
+      document.getElementById('green-subline').textContent =
+        `${bCount} deterministic IRDAI 2024 Master Circular violation${bCount === 1 ? '' : 's'} verified → Inspect clauses on right`;
+
+      // Right Tab Badges
+      document.getElementById('tab-breach-num').textContent = bCount;
+      const sumBadge = document.getElementById('rules-summary-badge');
+      sumBadge.textContent = bCount > 0 ? `${bCount} VIOLATED` : 'ALL COMPLIANT';
+      sumBadge.className = bCount > 0 ? 'font-extrabold text-[#B91C1C]' : 'font-extrabold text-[#15803D]';
+      document.getElementById('bill-total-badge').textContent = `₹${rep.total_duplicate_overcharge_inr.toLocaleString('en-IN')}`;
+
+      // 6-Yr Drive Chain
+      const drivePill = document.getElementById('drive-months-pill');
+      if (rep.continuous_coverage_months >= 60) {
+        drivePill.textContent = `${rep.continuous_coverage_months} Continuous Months · Moratorium Protected`;
+        drivePill.className = 'text-xs font-extrabold px-2.5 py-0.5 rounded-full bg-[#EAFBF0] text-[#15803D]';
+      } else {
+        drivePill.textContent = `${rep.continuous_coverage_months} Months · Below 60-Mo Cutoff`;
+        drivePill.className = 'text-xs font-extrabold px-2.5 py-0.5 rounded-full bg-[#FFF7EB] text-[#B45309]';
+      }
+
+      const renewals = caseData?.drive_policy_history?.continuous_renewals || [];
+      const activeYears = Math.min(6, years);
+      document.getElementById('renewal-pills').innerHTML = Array.from({ length: 6 }, (_, i) => {
+        const yr = renewals[i]?.year || renewals[i]?.policy_year || `Year ${i + 1}`;
+        const active = i < activeYears;
+        return `
+          <div class="rounded-xl py-2.5 px-2 text-center border transition ${
+            active ? 'bg-[#EAFBF0] border-[#86EFAC] text-[#15803D]' : 'bg-gray-50 border-gray-200 text-gray-400'
+          }">
+            <div class="text-xs font-extrabold">${yr}</div>
+            <div class="text-[11px] font-semibold mt-0.5">${active ? '✓ 12 mo' : '—'}</div>
+          </div>
+        `;
+      }).join('');
+
+      // 5 IRDAI Clauses
+      document.getElementById('irdai-clauses-list').innerHTML = data.all_rules.map(r => {
+        const violated = r.status === 'VIOLATED';
+        return `
+          <div class="rounded-2xl p-4 border transition ${
+            violated ? 'bg-[#FFF9F9] border-[#FECACA]' : 'bg-[#F6FDF8] border-[#BBF7D0]'
+          }">
+            <div class="flex items-start justify-between gap-3">
+              <div class="text-[13px] font-extrabold text-gray-900">${r.rule_name}</div>
+              <span class="text-[10px] font-extrabold px-2.5 py-1 rounded-full shrink-0 ${
+                violated ? 'bg-[#FFF1F1] text-[#B91C1C]' : 'bg-[#EAFBF0] text-[#15803D]'
+              }">${r.status}</span>
+            </div>
+            <p class="text-xs text-gray-600 mt-1.5 leading-relaxed">${r.finding}</p>
+            <div class="text-[10.5px] font-semibold text-gray-400 mt-1.5">${r.citation}</div>
+          </div>
+        `;
+      }).join('');
+
+      // Duplicate Charges + Full Bill
+      document.getElementById('dupe-list').innerHTML = rep.duplicate_charges.map(d => `
+        <div class="rounded-2xl bg-white border border-[#FECACA] p-3.5 flex items-center justify-between gap-3">
+          <div>
+            <div class="text-xs font-extrabold text-gray-900">${d.item_1}</div>
+            <div class="text-xs font-semibold text-[#B91C1C] line-through mt-0.5">${d.item_2}</div>
+            <div class="text-[11px] text-gray-500 mt-0.5">${d.date} · RapidFuzz ${d.similarity_score}% match</div>
+          </div>
+          <span class="text-sm font-extrabold text-[#B91C1C] shrink-0">₹${d.amount_inr.toLocaleString('en-IN')}</span>
+        </div>
+      `).join('');
+
+      const allItems = caseData?.hospital_bill_items || [];
+      document.getElementById('full-bill-list').innerHTML = allItems.map(item => `
+        <div class="py-2 flex items-center justify-between gap-3">
+          <div>
+            <span class="font-semibold text-gray-800">${item.description}</span>
+            <span class="text-[10.5px] text-gray-400 ml-1.5">${item.date}</span>
+          </div>
+          <span class="font-bold text-gray-700 shrink-0">₹${item.amount_inr.toLocaleString('en-IN')}</span>
+        </div>
+      `).join('');
+
+      // Audio Transcript
+      document.getElementById('audio-transcript').textContent = rep.voice_briefs[currentLang] || '';
+    }
+
+    function focusEvidenceTab(tab) {
+      ['rules', 'bill', 'draft'].forEach(t => {
+        const isTarget = t === tab;
+        document.getElementById(`pane-${t}`).classList.toggle('hidden', !isTarget);
+        const btn = document.getElementById(`rtab-${t}`);
+        btn.className = isTarget
+          ? 'px-3.5 py-1.5 rounded-lg bg-white text-[#1A1E66] shadow-2xs transition flex items-center gap-1.5'
+          : 'px-3.5 py-1.5 rounded-lg text-gray-500 hover:text-gray-900 transition flex items-center gap-1.5';
+      });
+    }
+
+    function setLang(lang) {
+      currentLang = lang;
+      ['EN', 'HI', 'KN'].forEach(l => {
+        const btn = document.getElementById(`lbtn-${l}`);
+        btn.className = l === lang
+          ? 'px-2.5 py-1 rounded-lg bg-[#FDE6C4] text-[#9A3412] transition'
+          : 'px-2.5 py-1 rounded-lg hover:bg-[#FDE6C4]/60 text-[#374151] transition';
+      });
+      if (currentAudit) {
+        document.getElementById('audio-transcript').textContent = currentAudit.report.voice_briefs[lang] || '';
+      }
+      if (isPlaying) {
+        stopAudio();
+        toggleAudio();
+      }
+    }
+
+    function stopAudio() {
+      if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+      clearInterval(audioInterval);
+      isPlaying = false;
+      audioSeconds = 0;
+      document.getElementById('eq-bars').classList.remove('audio-active');
+      document.getElementById('audio-progress').style.width = '0%';
+      document.getElementById('audio-timer').textContent = '(0:28)';
+      document.getElementById('audio-status-sub').textContent = DEFAULT_AUDIO_SUB;
+      document.getElementById('audio-svg').innerHTML = `
+        <path d="M11 5L6 9H2v6h4l5 4V5z"/>
+        <path d="M15.54 8.46a5 5 0 0 1 0 7.07" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+        <path d="M19.07 4.93a10 10 0 0 1 0 14.14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+      `;
+    }
+
+    function toggleAudio() {
+      if (!currentAudit || !('speechSynthesis' in window)) return;
+      if (isPlaying) {
+        stopAudio();
+        return;
+      }
+      window.speechSynthesis.cancel();
+      const utter = new SpeechSynthesisUtterance(currentAudit.report.voice_briefs[currentLang] || '');
+      utter.lang = currentLang === 'HI' ? 'hi-IN' : currentLang === 'KN' ? 'kn-IN' : 'en-IN';
+      utter.rate = 0.96;
+
+      utter.onstart = () => {
+        isPlaying = true;
+        audioSeconds = 0;
+        document.getElementById('eq-bars').classList.add('audio-active');
+        document.getElementById('audio-status-sub').textContent = `Playing ${currentLang} brief (Offline Web-Speech Fallback) · Tap to pause`;
+        document.getElementById('audio-svg').innerHTML = '<rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/>';
+        clearInterval(audioInterval);
+        audioInterval = setInterval(() => {
+          audioSeconds = Math.min(28, audioSeconds + 1);
+          const pct = Math.round((audioSeconds / 28) * 100);
+          document.getElementById('audio-progress').style.width = `${pct}%`;
+          document.getElementById('audio-timer').textContent = `(0:${String(audioSeconds).padStart(2, '0')} / 0:28)`;
+        }, 1000);
+      };
+      utter.onend = () => stopAudio();
+      utter.onerror = () => stopAudio();
+      window.speechSynthesis.speak(utter);
+    }
+
+    async function approveAndGenerate(silent = false) {
+      const payload = { ...getSimPayload(), user_approved: true };
+      const res = await fetch('/api/approve', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+      isApproved = true;
+
+      if (currentAudit) renderAudit(currentAudit);
+
+      document.getElementById('hitl-top-status').innerHTML = `
+        <span class="inline-flex items-center gap-1.5 text-[12px] sm:text-[13px] font-extrabold tracking-wide text-[#15803D] bg-[#EAFBF0] px-3 py-1 rounded-full">
+          ✓ HUMAN APPROVED · DRAFT ONLY
+        </span>
+      `;
+      const cta = document.getElementById('approve-cta');
+      cta.className = 'flex-1 py-4 px-6 rounded-[15px] bg-[#15803D] hover:bg-[#166534] text-white font-bold text-[16px] sm:text-[17.5px] transition flex items-center justify-center gap-2.5 shadow-md';
+      document.getElementById('approve-cta-label').textContent = 'Gmail Draft Saved + 3 SLA Clocks Active';
+
+      document.getElementById('draft-tab-dot').className = 'h-1.5 w-1.5 rounded-full bg-[#15803D]';
+      document.getElementById('draft-locked-state').classList.add('hidden');
+      document.getElementById('draft-unlocked-state').classList.remove('hidden');
+
+      document.getElementById('draft-to').textContent = data.draft.to;
+      document.getElementById('draft-subject').textContent = data.draft.subject;
+      document.getElementById('draft-body').value = data.draft.draft_body;
+
+      const labels = ['3-Hour Cap', '14-Day GRO SLA', '30-Day Ombudsman'];
+      document.getElementById('sla-cards').innerHTML = data.slas.reminders.map((s, i) => `
+        <div class="rounded-xl bg-[#F8FAFC] border border-gray-200/80 p-3 flex items-start justify-between gap-3">
+          <div>
+            <div class="text-[10.5px] font-extrabold uppercase tracking-wider text-[#15803D]">${labels[i] || 'SLA'}</div>
+            <div class="text-xs font-bold text-gray-900 mt-0.5">${s.title.replace('[ClaimBack SLA] ', '')}</div>
+            <p class="text-[11px] text-gray-500 mt-0.5">${s.rule}</p>
+          </div>
+          <span class="text-[11px] font-extrabold text-[#1A1E66] shrink-0">${s.trigger}</span>
+        </div>
+      `).join('');
+
+      if (!silent) {
+        focusEvidenceTab('draft');
+      }
+    }
+
+    function handleEditClick() {
+      if (isApproved) {
+        focusEvidenceTab('draft');
+        document.getElementById('draft-body').focus();
+      } else {
+        toggleSimulator();
+      }
+    }
+
+    function toggleSimulator() {
+      const drawer = document.getElementById('sim-drawer');
+      const backdrop = document.getElementById('sim-backdrop');
+      const isClosed = drawer.classList.contains('translate-x-full');
+      drawer.classList.toggle('translate-x-full', !isClosed);
+      backdrop.classList.toggle('hidden', !isClosed);
+    }
+
+    function toggleMcpModal() {
+      document.getElementById('mcp-modal').classList.toggle('hidden');
+    }
+
+    function openPrivacyModal() {
+      document.getElementById('pii-modal').classList.toggle('hidden');
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        document.getElementById('mcp-modal').classList.add('hidden');
+        document.getElementById('pii-modal').classList.add('hidden');
+        document.getElementById('sim-drawer').classList.add('translate-x-full');
+        document.getElementById('sim-backdrop').classList.add('hidden');
+      }
+    });
+
+    async function onSimChange() {
+      const p = getSimPayload();
+      document.getElementById('sim-lbl-months').textContent = `${p.coverage_months} months`;
+      document.getElementById('sim-lbl-cashless').textContent = `${p.cashless_hours} hrs`;
+      document.getElementById('sim-lbl-discharge').textContent = `${p.discharge_hours} hrs`;
+      await fetchAudit();
+      if (isApproved) {
+        await approveAndGenerate(true);
+      }
+    }
+
+    async function resetSimulation() {
+      document.getElementById('inp-months').value = 72;
+      document.getElementById('inp-cashless').value = 2.5;
+      document.getElementById('inp-discharge').value = 5.5;
+      document.getElementById('inp-pmc').checked = false;
+      document.getElementById('inp-clauses').checked = false;
+      isApproved = false;
+      document.getElementById('draft-locked-state').classList.remove('hidden');
+      document.getElementById('draft-unlocked-state').classList.add('hidden');
+      document.getElementById('draft-tab-dot').className = 'h-1.5 w-1.5 rounded-full bg-[#B91C1C]';
+      document.getElementById('hitl-top-status').innerHTML = `
+        <span class="inline-flex items-center gap-1.5 text-[12px] sm:text-[13px] font-extrabold tracking-wide text-[#15803D]">
+          <span class="h-2 w-2 rounded-full bg-[#15803D]"></span>
+          HITL GATE LOCKED
+        </span>
+      `;
+      const cta = document.getElementById('approve-cta');
+      cta.className = 'flex-1 py-4 px-6 rounded-[15px] bg-[#1A1E66] hover:bg-[#131652] active:scale-[0.995] text-white font-bold text-[16px] sm:text-[17.5px] transition flex items-center justify-center gap-2.5 shadow-md';
+      document.getElementById('approve-cta-label').textContent = 'Approve Gmail Draft + 14-Day Clock';
+      focusEvidenceTab('rules');
+      await onSimChange();
+    }
+
+    async function runLiveScanAnimation() {
+      const banner = document.getElementById('sync-banner');
+      const step = document.getElementById('sync-step-text');
+      banner.classList.remove('hidden');
+
+      const steps = [
+        '1/4 · Drive MCP (read-only): Verifying 6 continuous renewal PDFs...',
+        '2/4 · Presidio Gate: Masking Patient Name & Policy ID locally...',
+        '3/4 · Python IRDAI 2024 Engine: Checking May & Sep 2024 circulars + RapidFuzz...',
+        '4/4 · HITL Safety Gate: Enforced (BLOCKED_BY_HITL_GATE — Zero auto-send)'
+      ];
+      for (const s of steps) {
+        step.textContent = s;
+        await sleep(550);
+      }
+      await fetchAudit();
+      await sleep(450);
+      banner.classList.add('hidden');
+    }
+
+    function copyDraft() {
+      const ta = document.getElementById('draft-body');
+      ta.select();
+      navigator.clipboard.writeText(ta.value);
+      const btn = document.getElementById('copy-draft-btn');
+      btn.textContent = 'Copied ✓';
+      setTimeout(() => { btn.textContent = 'Copy Draft'; }, 1500);
+    }
+
+    init();
+  </script>
+</body>
+</html>
