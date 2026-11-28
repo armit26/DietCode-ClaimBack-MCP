@@ -19,3 +19,8 @@ out/
 .DS_Store
 .vscode/
 .idea/
+
+client_secret*.json
+.env.*
+!.env.example
+uploads/
