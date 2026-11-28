@@ -1,73 +1,88 @@
-# ClaimBack MCP ⭐️
-**An MCP-powered personal health insurance claims auditor & human-approved appeal assistant for Indian families.**
+# ClaimBack MCP
 
-[![Track](https://img.shields.io/badge/Track%201-Make%20MCP%20Matter-C2410C?style=flat-square)](https://github.com/armit26/DietCode-ClaimBack-MCP)
-[![Stack](https://img.shields.io/badge/Core-FastMCP%20%7C%20AWS%20%7C%20ElevenLabs-15803D?style=flat-square)](https://github.com/armit26/DietCode-ClaimBack-MCP)
-[![Status](https://img.shields.io/badge/wHACKiest%202026-Online%20Ideathon%20Shortlisted-1A1E66?style=flat-square)](https://github.com/armit26/DietCode-ClaimBack-MCP)
+An MCP-powered health insurance claims auditor and human-approved appeal assistant for Indian families.
 
-> **Team Diet Code**
-> *Built for wHACKiest 2026 — Track 1: Make MCP Matter (Less Magic, More Utility)*
+[![Track](https://img.shields.io/badge/Track%201-Make%20MCP%20Matter-1A1E66?style=flat-square)](https://github.com/armit26/DietCode-ClaimBack-MCP)
+[![Finale](https://img.shields.io/badge/wHACKiest%202026-Top%2069%20Finalist%20(S11)-15803D?style=flat-square)](https://whackiest-2026.vercel.app/Offline-Finale-shortlisted)
+[![Stack](https://img.shields.io/badge/Stack-FastMCP%20%7C%20FastAPI%20%7C%20AWS%20%7C%20ElevenLabs-374151?style=flat-square)](https://github.com/armit26/DietCode-ClaimBack-MCP)
 
----
-
-## 🚨 The Problem
-During a medical emergency, families cannot audit a **40-page policy PDF** and an inflated **12-page hospital bill** scattered across Gmail and Drive—so under stress, they quietly absorb thousands of rupees in **unfair rejections and hidden deductions**.
-
-| Reality Check | Verified Signal |
-| :--- | :--- |
-| **58 Crore+** | Insured Indians (~33.5 Cr private retail & group) filing **3.26 Crore+ health claims/year** *(IRDAI)* |
-| **2.97 Lakh** | Grievances hit IRDAI's *Bima Bharosa* portal in FY26 alone (up from 2.58L in FY25; ~69% claim disputes — *Finance Ministry / IRDAI*) |
-| **₹2 Crore** | Nov 2026: IRDAI fined Star Health ₹2 Crore for unjustified claim rejections and unsupported bill deductions |
-
-**Why current options fail:** Grievance portals (*Bima Bharosa*) are filing channels only—no bill audit or deadline tracking; claim agents are slow, mostly English, and take a **10–15% payout cut**; generic AI chatbots hallucinate insurance regulations and lack controlled access to real records.
+**Team Diet Code** · Built for **wHACKiest 2026** (Track 1: *Make MCP Matter — Less Magic, More Utility*)
 
 ---
 
-## 💡 Our Solution: ClaimBack MCP
-**ClaimBack MCP** connects a family's everyday apps via **Model Context Protocol (MCP)** using strict **read/draft-only scopes**, audits policies and hospital bills against **codified IRDAI 2024 rules**, explains rights aloud in regional languages, and enforces a **strict Human-in-the-Loop (HITL) approval gate**.
+## wHACKiest 2026 Offline Finale
 
-### The 4 Scoped FastMCP Tools (`mcp_server/server.py`)
-1. **`drive_policy_fetcher`** — Fetches policy metadata and multi-year continuous renewal history via read-only Google Drive scope to verify moratorium eligibility.
-2. **`irdai_rule_auditor`** — Runs deterministic Python/JSON checks against IRDAI 2024 rules and uses `RapidFuzz` fuzzy matching to catch duplicate hospital bill charges.
-3. **`gmail_draft_escalator`** — Generates an editable Grievance Redressal Officer (GRO) appeal draft in Gmail (**zero autonomous sending**; hard-blocked until explicit human approval).
-4. **`calendar_sla_tracker`** — Schedules automated SLA clocks (3-hr discharge cap, 14-day insurer grievance resolution deadline, and 30-day Ombudsman eligibility) via Google Calendar.
+**Selected as 1 of the 69 teams** (out of 4,139 participants / ~1,200 teams, and 1 of 25 teams in *Make MCP Matter*) to compete in the 24-hour Offline Finale at **wHACKiest 2026**, Ramaiah Institute of Technology, Bengaluru (Dec 1–2, 2026).
 
-### Deterministic IRDAI 2024 Rules Checked (`rules/irdai_2024_rules.json`)
-| Rule ID | IRDAI 2024 Mandate | Regulatory Basis |
+* **Shortlist Slot:** `S11` — Team Diet Code 
+* **Official Shortlist:** [whackiest-2026.vercel.app/Offline-Finale-shortlisted](https://whackiest-2026.vercel.app/Offline-Finale-shortlisted)
+
+<p align="center">
+  <img src="assets/final-cut.png" alt="wHACKiest 2026 Offline Finale Shortlist — Team Diet Code (S11)" width="88%" />
+</p>
+
+---
+
+## The Problem
+
+During a medical emergency, families are rarely in a state to cross-check a 40-page policy document against a 12-page hospital bill and a rejection email scattered across Gmail and Drive. Under pressure at the billing desk, most people end up absorbing unfair rejections and duplicate charges out of pocket.
+
+* **58 Crore+** insured Indians filing **3.26 Crore+ health claims/year** *(IRDAI)*
+* **2.97 Lakh** grievances logged on IRDAI's *Bima Bharosa* portal in FY26 alone, up from 2.58L in FY25 (~69% claim disputes — *Finance Ministry / IRDAI*)
+* **₹2 Crore** fine levied by IRDAI on Star Health in Nov 2026 for unjustified claim rejections and unsupported deductions
+
+Existing alternatives fall short: *Bima Bharosa* is only a filing portal (no bill audit or deadline tracking), third-party claim agents take a **10–15% payout cut**, and generic AI chatbots hallucinate insurance regulations while lacking controlled access to actual family records.
+
+---
+
+## How ClaimBack MCP Works
+
+ClaimBack MCP connects a family's everyday apps via **Model Context Protocol (MCP)** using strict read-only and draft-only scopes. Instead of letting an LLM guess the law, messy policy/bill text is structured after local PII redaction and verified against **deterministic Python rules** codified from IRDAI's May and September 2024 Master Circulars.
+
+### Registered FastMCP Tools (`mcp_server/server.py`)
+
+1. **`drive_policy_fetcher`** (`drive.readonly`) — Pulls policy metadata and multi-year continuous renewal history from Google Drive to verify moratorium eligibility.
+2. **`irdai_rule_auditor`** (`local.deterministic`) — Audits the claim against 5 codified IRDAI 2024 rules and runs `RapidFuzz` token-sort matching to flag duplicate hospital bill line items.
+3. **`gmail_draft_escalator`** (`gmail.compose`, draft-only) — Prepares an editable Grievance Redressal Officer (GRO) appeal draft. Hard-blocked (`BLOCKED_BY_HITL_GATE`) until explicit human approval—zero autonomous sending.
+4. **`calendar_sla_tracker`** (`calendar.events`) — Schedules statutory escalation clocks: 3-hour hospital discharge cap, 14-day insurer grievance resolution deadline, and 30-day Insurance Ombudsman eligibility.
+
+### IRDAI 2024 Rules Verified (`rules/irdai_2024_rules.json`)
+
+| Rule ID | Mandate | Regulatory Reference |
 | :--- | :--- | :--- |
-| **`IRDAI_CASHLESS_1HR`** | Initial cashless decision within **1 hour** of receipt of request | Sep 2024 Circular, Sec I, Part B, V.3(i), 1(i) |
-| **`IRDAI_DISCHARGE_3HR`** | Final discharge approval within **3 hours** (extra stay cost borne by insurer from shareholders' funds) | Sep 2024 Circular, Sec I, Part B, V.3(i), 2(i)–(ii) |
-| **`IRDAI_REIMBURSEMENT_15D`** | Non-cashless settlement within **15 days from claim submission**; delays attract **bank rate + 2% interest** paid *suo motu* from claim intimation until payment | Sep 2024 Circular, Sec I, Part B, V.2(ii) & V.3(iii)(6) |
-| **`IRDAI_MORATORIUM_60M`** | After **60 continuous months** (including ported/migrated credits), non-disclosure/misrepresentation contestability is barred except **established fraud** *(applies to initial sum insured; separate 60-mo clock on enhanced sum insured; permanent exclusions remain separate)* | IRDAI (Insurance Products) Regs 2024, Sch. III, Para 8 & May 2024 Circular, Ch. I, Para 13 |
-| **`IRDAI_PMC_CRC_REPUDIATION`** | No claim repudiation without **PMC** or 3-member **CRC** approval; all repudiated, rejected, or partially disallowed claims must cite specific policy terms in writing | Sep 2024 Circular, Sec I, Part B, V.3(iii) & May 2024 Circular, Ch. I, Para 17 |
-| **Bill Dupe Audit** | Fuzzy line-item matching (`RapidFuzz`) catches repeated consumables & split hospital charges | Line-item billing verification |
+| `IRDAI_CASHLESS_1HR` | Initial cashless decision within **1 hour** of request | Sep 2024 Circular, Sec I, Part B, V.3(i), 1(i) |
+| `IRDAI_DISCHARGE_3HR` | Final discharge authorization within **3 hours** (extra stay cost borne by insurer from shareholders' funds) | Sep 2024 Circular, Sec I, Part B, V.3(i), 2(i)–(ii) |
+| `IRDAI_REIMBURSEMENT_15D` | Non-cashless settlement within **15 days** of submission; delays attract **bank rate + 2% interest** paid *suo motu* from intimation | Sep 2024 Circular, Sec I, Part B, V.2(ii) & V.3(iii)(6) |
+| `IRDAI_MORATORIUM_60M` | After **60 continuous months** (including ported/migrated credits), non-disclosure/misrepresentation contestability is barred except **established fraud** *(applies to initial sum insured; separate 60-mo clock on enhancements; permanent exclusions remain separate)* | IRDAI (Insurance Products) Regs 2024, Sch. III, Para 8 & May 2024 Circular, Ch. I, Para 13 |
+| `IRDAI_PMC_CRC_REPUDIATION` | No repudiation without **PMC** or 3-member **CRC** approval; rejections and partial disallowances must cite specific policy clauses in writing | Sep 2024 Circular, Sec I, Part B, V.3(iii) & May 2024 Circular, Ch. I, Para 17 |
+| Duplicate Bill Audit | `RapidFuzz` token-sort ratio catches repeated or slightly reworded hospital consumables billed on the same date | Itemized bill verification |
 
-> **Escalation Rights Encoded:** Policyholders may register complaints with the insurer's **GRO** or directly on IRDAI's **Bima Bharosa** portal (no waiting period required; 14-day insurer resolution SLA), and approach the **Insurance Ombudsman** (claims up to ₹50 Lakh) if unresolved after 30 days or resolved unsatisfactorily after written representation to the insurer.
+> **Escalation note:** Policyholders can file with the insurer's GRO or directly on IRDAI's *Bima Bharosa* portal anytime (14-day insurer resolution SLA), and approach the Insurance Ombudsman (claims up to ₹50 Lakh) if unresolved after 30 days or resolved unsatisfactorily.
 
 ---
 
-## 🏗️ System Architecture & Data Flow
+## Architecture
 
 ```text
-[1. INPUT & FRONTEND]            [2. AWS + AI & IRDAI ENGINE]           [3. SAFETY GATE & VOICE]         [4. SAFE MCP OUTPUTS]
-Next.js · Tailwind · OAuth       FastAPI · FastMCP (AWS Lambda)         STRICT ZERO AUTO-SEND            Everyday Apps (MCP)
+[1. CLIENT & OAUTH]              [2. BACKEND & IRDAI ENGINE]            [3. HITL GATE & VOICE]           [4. SCOPED MCP OUTPUTS]
+Tailwind UI · Google OAuth       FastAPI · FastMCP (AWS Lambda)         ZERO AUTO-SEND                   Everyday Apps
 ┌─────────────────────────┐      ┌────────────────────────────────┐     ┌─────────────────────────┐      ┌─────────────────────────┐
-│ • Upload hospital bill  │HTTPS │ • AWS Textract + PyMuPDF OCR   │Audit│ • HITL Approval Gate    │User  │ • Gmail MCP:            │
-│ • Forward rejection mail├─────►│ • Presidio PII Masking         ├────►│   Red/Green clause diff │Appr. │   Editable GRO draft    │
-│ • Sync 6-yr Drive docs  │+PDFs │ • Claude API + Pydantic JSON   │Rpt. │   1-Click Human Approve ├─────►│ • Calendar MCP:         │
-│ • View Red/Green diff   │      │ • 5 IRDAI Rules + RapidFuzz    │     │ • ElevenLabs Voice      │      │   3-hr, 14-d & 30-d SLA │
-└─────────────────────────┘      └───────────────┬────────────────┘     │   Brief (EN · HI · KN)  │      │ • PDF Dossier:          │
-                                                 │ Store                └────────────┬────────────┘      │   Bima Bharosa/Ombuds.  │
-                                                 ▼                                   ▼ Log               └────────────┬────────────┘
+│ • Upload hospital bill  │HTTPS │ • AWS Textract + PyMuPDF OCR   │Audit│ • Red/Green clause diff │Human │ • Gmail MCP:            │
+│ • Sync rejection email  ├─────►│ • Presidio Local PII Masking   ├────►│ • 1-Click Human Approve │Appr. │   Editable GRO draft    │
+│ • Sync 6-yr Drive PDFs  │+PDFs │ • Claude API + Pydantic JSON   │Rpt. │ • ElevenLabs Voice      ├─────►│ • Calendar MCP:         │
+│ • Live What-If tester   │      │ • 5 IRDAI Rules + RapidFuzz    │     │   Brief (EN · HI · KN)  │      │   3-hr, 14-d & 30-d SLA │
+└─────────────────────────┘      └───────────────┬────────────────┘     └────────────┬────────────┘      │ • PDF Dossier:          │
+                                                 │ Store                             │ Log               │   Bima Bharosa/Ombuds.  │
+                                                 ▼                                   ▼                   └────────────┬────────────┘
                            ┌──────────────────────────────────────────────────────────────────────────────────────────┴───┐
-                           │        ENCRYPTED DATABASE & AUDIT TRAIL (DPDP ACT ALIGNED)                                   │
-                           │   AWS S3 (SSE-KMS PDFs)  ·  AWS DynamoDB (Audit & Approval Logs)  ·  1-Click User Delete     │
+                           │        ENCRYPTED STORAGE & AUDIT LOGS (DPDP ACT ALIGNED)                                     │
+                           │   AWS S3 (SSE-KMS PDFs)  ·  AWS DynamoDB (Approval Trail)  ·  1-Click User Delete            │
                            └──────────────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## 🚀 Quick Start (Run the Live Prototype Locally)
+## Running Locally
 
 ```bash
 git clone [https://github.com/armit26/DietCode-ClaimBack-MCP.git](https://github.com/armit26/DietCode-ClaimBack-MCP.git)
@@ -77,68 +92,68 @@ python3 -m venv .venv
 source .venv/bin/activate        # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 
-# 1. Launch the interactive web app (FastAPI + live IRDAI Audit Card & What-If simulator)
+# 1. Start the interactive web prototype (FastAPI + live Audit Card & What-If simulator)
 uvicorn api:app --reload
-# Open [http://127.0.0.1:8000](http://127.0.0.1:8000) in your browser
+# Open [http://127.0.0.1:8000](http://127.0.0.1:8000)
 
-# 2. Or run the interactive CLI audit + RapidFuzz + HITL approval demo
+# 2. Run the standalone CLI audit + HITL approval demo
 python demo_run.py
 
-# 3. Launch the 4-tool Python FastMCP server
+# 3. Run the 4-tool Python FastMCP server
 python -m mcp_server.server
 ```
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
-| Layer | Technology / API | Purpose |
+| Layer | Tools | Role |
 | :--- | :--- | :--- |
-| **Frontend** | Tailwind CSS (Live Demo) · Next.js (Prod) | Responsive web app for phone/laptop use right at the hospital desk |
-| **MCP Layer** | Python FastMCP SDK + Google OAuth 2.0 | Standard tool bridge to Gmail, Drive & Calendar with read/draft-only scopes |
-| **Backend & Cloud** | FastAPI (Python) on AWS Lambda + API Gateway | Serverless execution hosting our 4 MCP tools & REST bridge |
-| **Document Parsing** | AWS Textract + PyMuPDF + RapidFuzz | Extracts multi-column hospital bills & catches duplicate line items |
-| **AI & IRDAI Rules** | Claude API + IRDAI 2024 JSON + Pydantic | AI structures messy clauses; deterministic Python rules verify the law |
-| **Voice Co-Pilot** | ElevenLabs Multilingual v2 TTS | Calm 30s spoken rights briefs in English, Hindi & Kannada (with offline fallback) |
-| **Database & Privacy** | AWS S3 (SSE-KMS) + DynamoDB + Microsoft Presidio | Masks patient IDs before AI calls, encrypts files & logs user approvals |
+| **Frontend** | Tailwind CSS (Live Prototype) · Next.js (Prod) | Responsive audit card, live What-If simulator, and approval UI |
+| **MCP Layer** | Python `FastMCP` SDK + Google OAuth 2.0 | Standardized read/draft-only tool bridge to Drive, Gmail, and Calendar |
+| **Backend & Cloud** | FastAPI (Python) · AWS Lambda + API Gateway | Hosts MCP tools and REST bridge |
+| **Document Audit** | AWS Textract · PyMuPDF · `RapidFuzz` | Multi-column bill parsing and fuzzy duplicate charge detection |
+| **Rules & Structuring** | Claude API · Pydantic · JSON Rulebook | LLM handles text structuring; pure Python enforces IRDAI 2024 rules |
+| **Voice Co-Pilot** | ElevenLabs Multilingual v2 (with offline Web-Speech fallback) | Spoken 30s rights briefs in English, Hindi, and Kannada |
+| **Privacy & Storage** | Microsoft Presidio · AWS S3 (SSE-KMS) · DynamoDB | Local PII redaction before LLM calls, encrypted storage, and 1-click delete |
 
 ---
 
-## 📂 Repository Structure & Online Ideathon Build
-> *Shortlisted from Round 1 for the **wHACKiest 2026 Online Ideathon** — expanded with a live FastAPI bridge and interactive web demo ahead of panel evaluation.*
+## Repository Structure
 
 ```text
+├── assets/
+│   └── final-cut.png              # wHACKiest 2026 Offline Finale shortlist
 ├── frontend/
-│   └── index.html                 # Interactive Red/Green Audit Card, What-If simulator & HITL UI
+│   └── index.html                 # Interactive Audit Card, What-If simulator & HITL UI
 ├── rules/
-│   └── irdai_2024_rules.json      # Verified IRDAI May & Sep 2024 rulebook & citations
+│   └── irdai_2024_rules.json      # Codified IRDAI May & Sep 2024 rules + citations
 ├── mcp_server/
 │   ├── __init__.py
-│   ├── auditor.py                 # Deterministic 5-rule engine + RapidFuzz bill dupe audit
-│   └── server.py                  # Python FastMCP server exposing all 4 scoped tools
+│   ├── auditor.py                 # Deterministic 5-rule engine + RapidFuzz bill audit
+│   └── server.py                  # Python FastMCP server exposing 4 scoped tools
 ├── sample_data/
-│   └── case_cb_204.json           # End-to-end test case (72-mo moratorium + ₹8,600 dupes)
-├── api.py                         # FastAPI bridge connecting the web UI to FastMCP & auditor.py
-├── demo_run.py                    # 1-command interactive CLI prototype with HITL gate
+│   └── case_cb_204.json           # Synthetic test case (72-mo moratorium + ₹8,600 dupes)
+├── api.py                         # FastAPI bridge connecting UI to FastMCP & auditor.py
+├── demo_run.py                    # CLI prototype with HITL gate
 ├── requirements.txt
 ├── .gitignore
 └── README.md
 ```
 
-### Ideathon Prototype Checklist (Nov 23 – Nov 26)
-- [x] Problem validation, IRDAI 2024 regulatory mapping & architecture design
-- [x] `rules/irdai_2024_rules.json` — Verified 5-rule IRDAI 2024 dataset with exact circular citations
-- [x] `mcp_server/` — Working Python `FastMCP` server with 4 tools & `RapidFuzz` duplicate bill detector
-- [x] `sample_data/case_cb_204.json` + `demo_run.py` — End-to-end runnable HITL audit prototype
-- [x] `api.py` & `frontend/index.html` — Live interactive Red/Green Audit Card, What-If rule simulator, MCP Tools inspector, voice brief & HITL approval gate
+### Roadmap
+
+- [x] **Round 1 & Online Ideathon:** Codified IRDAI 2024 ruleset, 4-tool Python `FastMCP` server, `RapidFuzz` duplicate bill detector, local PII masking preview, and interactive web prototype with HITL gate
+- [ ] **24-Hr Offline Finale (Dec 1–2 @ RIT):** Live Google OAuth (`drive.readonly`, `gmail.compose`, `calendar.events`), live hospital bill PDF upload with OCR/Textract, live ElevenLabs Multilingual v2 audio streaming, and 1-click Ombudsman PDF dossier export
 
 ---
 
-## 🔒 Privacy & Safe Positioning
-- **Strict Human-in-the-Loop (HITL):** Gmail MCP is scoped to save **editable drafts only**—ClaimBack MCP never sends an email autonomously.
-- **DPDP Act Aligned:** Patient identifiers are masked before LLM processing, documents are stored encrypted on AWS S3, and users have 1-click delete control.
-- **Disclaimer:** ClaimBack MCP is a clause-backed audit and appeal-drafting helper, **not formal legal advice**. All escalation decisions remain 100% with the policyholder.
+## Privacy & Disclaimer
+
+* **Human-in-the-Loop (HITL):** Gmail integration is restricted to editable drafts only—ClaimBack MCP never sends emails autonomously.
+* **DPDP Act Aligned:** Patient names and policy IDs are redacted locally before LLM structuring, with encrypted storage and 1-click user deletion planned for production.
+* **Not Legal Advice:** ClaimBack MCP is a clause-backed claim audit and appeal-drafting assistant, not formal legal counsel. Final escalation decisions stay with the policyholder.
 
 ---
 
-## 👥 Team Diet Code
+**Team Diet Code**
